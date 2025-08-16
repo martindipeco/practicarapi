@@ -23,7 +23,26 @@ public class Usuario implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String login;
+    private String email;
     private String clave;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol")
+    private Rol rol;
+
+    // Custom constructor for login and clave
+    public Usuario(String login, String clave, Rol rol) {
+        this.login = login;
+        this.clave = clave;
+        this.rol = rol;
+    }
+
+    public Usuario(String login, String clave, String email, Rol rol) {
+        this.login = login;
+        this.clave = clave;
+        this.rol = rol;
+        this.email = email;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -58,5 +77,10 @@ public class Usuario implements UserDetails {
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
+    }
+
+    // Helper method for JWT claims
+    public String getRoleName() {
+        return rol.name();
     }
 }
