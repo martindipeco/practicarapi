@@ -1,17 +1,18 @@
 package com.alura.back.controller;
 
-import com.alura.back.domain.usuario.DatosRegistrarUsuario;
-import com.alura.back.domain.usuario.Rol;
-import com.alura.back.domain.usuario.Usuario;
-import com.alura.back.domain.usuario.UsuarioRepository;
+import com.alura.back.domain.usuario.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/registro")
@@ -24,7 +25,8 @@ public class RegistroController {
     private BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping
-    public ResponseEntity registrarUsuario(@RequestBody @Valid DatosRegistrarUsuario datosRegistrarUsuario){
+    public ResponseEntity registrarUsuario(@RequestBody @Valid DatosRegistrarUsuario datosRegistrarUsuario
+    , UriComponentsBuilder uriComponentsBuilder){
         if (usuarioRepository.findByLogin(datosRegistrarUsuario.login()) != null) {
             return ResponseEntity.badRequest().build();
         }
@@ -38,10 +40,13 @@ public class RegistroController {
 
         String encryptedPassword = passwordEncoder.encode(datosRegistrarUsuario.clave());
         Usuario nuevoUsuario = new Usuario(datosRegistrarUsuario.login(), encryptedPassword,
-                datosRegistrarUsuario.email(),datosRegistrarUsuario.rol());
+                datosRegistrarUsuario.email(),rol);
         usuarioRepository.save(nuevoUsuario);
 
-        return ResponseEntity.ok().build();
+        // return ResponseEntity.ok().build();
+        DatosRespuestaUsuario datosRespuestaUsuario = new DatosRespuestaUsuario(nuevoUsuario.getId());
+        URI url = uriComponentsBuilder.path("/usuarios/{id}").buildAndExpand(nuevoUsuario.getId()).toUri();
+        return ResponseEntity.created(url).body(datosRespuestaUsuario);
     }
 
 }

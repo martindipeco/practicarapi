@@ -34,6 +34,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
+                        .requestMatchers(HttpMethod.GET, "/hello").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/registro").permitAll()
                         //.requestMatchers(HttpMethod.GET, "/", "/api/mentorias", "/api/certificaciones/{id}", "/api/cursos/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -72,7 +73,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // For production, use specific origins:
-        // configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://yourdomain.com"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "https://yourdomain.com"));
         //configuration.setAllowedOrigins(Arrays.asList("https://pruebamentora.netlify.app/"));
         configuration.setAllowedOriginPatterns(Arrays.asList("*")); // For development
 
